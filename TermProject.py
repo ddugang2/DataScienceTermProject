@@ -9,22 +9,22 @@ from sklearn.preprocessing import StandardScaler
 
 warnings.filterwarnings('ignore')
 
-pd.set_option("display.max_rows", 4, "display.max_columns", 21)
+pd.set_option("display.max_rows", 18, "display.max_columns", 21)
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
 # Read Excel file
 dataset = pd.read_csv('C:/WA_Fn-UseC_-Telco-Customer-Churn.csv')
 
 # statistical summary of dataset
-print("dataset statistical")
+print("# dataset statistical")
 print(dataset.describe(),"\n")
-print("dataset head")
+print("# dataset head")
 print(dataset.head(5), "\n")
-print("dataset shape")
+print("# dataset shape")
 print(dataset.shape, "\n")
-print("dataset index")
+print("# dataset index")
 print(dataset.index, "\n")
-print("dataset columns")
+print("# dataset features")
 print(dataset.columns, "\n")
 
 dataset = dataset.drop(columns='customerID')
@@ -35,16 +35,17 @@ dataset = dataset.drop(columns='PaymentMethod')
 dataset['tenure'].replace(0, np.NAN, inplace=True)
 
 # print is nan
+print("# the number of null values")
 print(dataset.isna().sum(), "\n")
 
 # replace missing & wrong data with mean
 dataset['tenure'].replace(np.NAN, dataset['tenure'].mean(), inplace=True)
 dataset['TotalCharges'].replace(np.NAN, dataset['TotalCharges'].mean(), inplace=True)
 
+print("# the number of null values after fill missing and wrong values ")
 print(dataset.isnull().sum(), "\n")
 
-print('histograms')
-
+print("# histograms")
 plt.subplot(121)
 plt.title("gender")
 plt.hist(dataset['gender'], bins=3)
@@ -54,7 +55,6 @@ plt.hist(dataset['SeniorCitizen'], bins=3)
 plt.xlabel("0 = junior,1 = senior")
 plt.xticks([0,1])
 plt.show()
-
 plt.subplot(121)
 plt.title("Partner")
 plt.hist(dataset['Partner'], bins=3)
@@ -62,7 +62,6 @@ plt.subplot(122)
 plt.title("Dependents")
 plt.hist(dataset['Dependents'], bins=3)
 plt.show()
-
 plt.subplot(121)
 plt.title("tenure")
 plt.hist(dataset['tenure'], bins=10)
@@ -71,7 +70,6 @@ plt.subplot(122)
 plt.title("PhoneService")
 plt.hist(dataset['PhoneService'], bins=3)
 plt.show()
-
 plt.subplot(121)
 plt.title("MultipleLines")
 plt.hist(dataset['MultipleLines'], bins=5)
@@ -79,7 +77,6 @@ plt.subplot(122)
 plt.title("InternetService")
 plt.hist(dataset['InternetService'], bins=5)
 plt.show()
-
 plt.subplot(121)
 plt.title("OnlineSecurity")
 plt.hist(dataset['OnlineSecurity'], bins=5)
@@ -87,7 +84,6 @@ plt.subplot(122)
 plt.title("OnlineBackup")
 plt.hist(dataset['OnlineBackup'], bins=5)
 plt.show()
-
 plt.subplot(121)
 plt.title("DeviceProtection")
 plt.hist(dataset['DeviceProtection'], bins=5)
@@ -95,7 +91,6 @@ plt.subplot(122)
 plt.title("TechSupport")
 plt.hist(dataset['TechSupport'], bins=5)
 plt.show()
-
 plt.subplot(121)
 plt.title("StreamingTV")
 plt.hist(dataset['StreamingTV'], bins=5)
@@ -103,7 +98,6 @@ plt.subplot(122)
 plt.title("StreamingMovies")
 plt.hist(dataset['StreamingMovies'], bins=5)
 plt.show()
-
 plt.subplot(121)
 plt.title("Contract")
 plt.hist(dataset['Contract'], bins=5)
@@ -111,12 +105,10 @@ plt.subplot(122)
 plt.title("MonthlyCharges")
 plt.hist(dataset['PhoneService'], bins=3)
 plt.show()
-
 plt.title("TotalCharges")
 plt.hist(dataset['TotalCharges'], bins=10)
 plt.xticks([0,1000,2000,3000,4000,5000,6000,7000,8000,dataset['TotalCharges'].max()])
 plt.show()
-
 plt.title("Churn")
 plt.hist(dataset['Churn'], bins=3)
 plt.show()
