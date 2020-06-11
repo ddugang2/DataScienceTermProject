@@ -13,7 +13,8 @@ pd.set_option("display.max_rows", 18, "display.max_columns", 21)
 np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 
 # Read Excel file
-dataset = pd.read_csv('C:/WA_Fn-UseC_-Telco-Customer-Churn.csv')
+# 상운 dataset = pd.read_csv(r'C:\Users\dltkd\OneDrive\바탕 화면\3학년 1학기\데이터 과학\termproject\WA_Fn-UseC_-Telco-Customer-Churn.csv')
+dataset = pd.read_csv(r'C:\Users\dltkd\OneDrive\바탕 화면\3학년 1학기\데이터 과학\termproject\WA_Fn-UseC_-Telco-Customer-Churn.csv')
 
 # statistical summary of dataset
 print("# dataset statistical")
@@ -136,4 +137,4 @@ standard_X = StandardScaler()
 X_train = standard_X.fit_transform(X_train)
 X_test = standard_X.fit_transform(X_test)
 
-#print(X_train)
+print(X_train)
