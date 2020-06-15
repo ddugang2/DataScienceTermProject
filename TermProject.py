@@ -15,6 +15,7 @@ np.set_printoptions(threshold=np.inf, linewidth=np.inf)
 # Read Excel file
 # 상운 dataset = pd.read_csv(r'C:\Users\dltkd\OneDrive\바탕 화면\3학년 1학기\데이터 과학\termproject\WA_Fn-UseC_-Telco-Customer-Churn.csv')
 # 수경 dataset = pd.read_csv('C:/WA_Fn-UseC_-Telco-Customer-Churn.csv')
+# 소라 dataset = pd.read_csv('C:\Users\ehrqo\Desktop\WA_Fn-UseC_-Telco-Customer-Churn.csv')
 dataset = pd.read_csv(r'C:\Users\dltkd\OneDrive\바탕 화면\3학년 1학기\데이터 과학\termproject\WA_Fn-UseC_-Telco-Customer-Churn.csv')
 
 # statistical summary of dataset
