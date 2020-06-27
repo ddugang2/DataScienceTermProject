@@ -6,9 +6,10 @@ import warnings
 from pandas.plotting import parallel_coordinates
 from scipy.spatial.distance import cdist
 from sklearn.cluster import KMeans
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler
 import plotly.graph_objs as go #visualization
 import plotly.offline as py #visualization
@@ -41,6 +42,82 @@ print("# dataset index")
 print(dataset.index, "\n")
 print("# dataset features")
 print(dataset.columns, "\n")
+'''
+print("# histograms")
+plt.subplot(121)
+plt.title("gender distribution")
+plt.hist(dataset['gender'], bins=3)
+plt.subplot(122)
+plt.title("SeniorCitizen distribution")
+plt.hist(dataset['SeniorCitizen'], bins=3)
+plt.xlabel("0 = junior,1 = senior")
+plt.xticks([0,1])
+plt.show()
+plt.subplot(121)
+plt.title("Partner distribution")
+plt.hist(dataset['Partner'], bins=3)
+plt.subplot(122)
+plt.title("Dependents distribution")
+plt.hist(dataset['Dependents'], bins=3)
+plt.show()
+plt.subplot(121)
+plt.title("tenure")
+plt.hist(dataset['tenure'], bins=10)
+plt.xticks([0,10,20,30,40,50,60,dataset['tenure'].max()])
+plt.subplot(122)
+plt.title("PhoneService distribution")
+plt.hist(dataset['PhoneService'], bins=3)
+plt.show()
+plt.subplot(121)
+plt.title("MultipleLines distribution")
+plt.hist(dataset['MultipleLines'], bins=5)
+plt.subplot(122)
+plt.title("InternetService distribution")
+plt.hist(dataset['InternetService'], bins=5)
+plt.show()
+plt.subplot(121)
+plt.title("OnlineSecurity distribution")
+plt.hist(dataset['OnlineSecurity'], bins=5)
+plt.subplot(122)
+plt.title("OnlineBackup distribution")
+plt.hist(dataset['OnlineBackup'], bins=5)
+plt.show()
+plt.subplot(121)
+plt.title("DeviceProtection distribution")
+plt.hist(dataset['DeviceProtection'], bins=5)
+plt.subplot(122)
+plt.title("TechSupport distribution")
+plt.hist(dataset['TechSupport'], bins=5)
+plt.show()
+plt.subplot(121)
+plt.title("StreamingTV distribution")
+plt.hist(dataset['StreamingTV'], bins=5)
+plt.subplot(122)
+plt.title("StreamingMovies distribution")
+plt.hist(dataset['StreamingMovies'], bins=5)
+plt.show()
+plt.subplot(121)
+plt.title("Contract distribution")
+plt.hist(dataset['Contract'], bins=5)
+plt.subplot(122)
+plt.title("MonthlyCharges distribution")
+plt.hist(dataset['PhoneService'], bins=3)
+plt.show()
+plt.subplot(121)
+plt.title("PaperlessBilling distribution")
+plt.hist(dataset['PaperlessBilling'], bins=3)
+plt.subplot(122)
+plt.title("Churn distribution")
+plt.hist(dataset['Churn'], bins=3)
+plt.show()
+plt.title("TotalCharges distribution")
+plt.hist(dataset['TotalCharges'], bins=10)
+plt.xticks([0,1000,2000,3000,4000,5000,6000,7000,8000,dataset['TotalCharges'].max()])
+plt.show()
+plt.title("PaymentMethod distribution")
+plt.hist(dataset['PaymentMethod'], bins=10)
+plt.show()
+'''
 
 #  ID column because it is meaningless
 dataset = dataset.drop(columns='customerID')
@@ -122,14 +199,15 @@ for i in range (len(index)):
 
 print("# Handle missing values")
 # print is nan
-print("# number of null values ")
+print(" 1. number of null values ")
 print(dataset.isnull().sum(), "\n")
 
-print("# 1. drop the rows which have null value")
+print(" 2. drop the rows which have null value")
 dataset_drop = pd.DataFrame(dataset.dropna(how='any'), columns=dataset.columns)
 print(dataset_drop.isnull().sum())
 
-print("# 2. fill missing values with k-means clustering")
+print("")
+print(" 3. fill missing values with k-means clustering")
 # test dataset 만들기
 test_x = dataset[dataset['tenure'].isna()]
 test_y = dataset[dataset['tenure'].isna()]
@@ -175,14 +253,17 @@ test_y.loc[(test_y['KMeans']==0),'tenure']=train_x.loc[(train_x['KMeans']==0),'t
 test_y.loc[(test_y['KMeans']==1),'tenure']=train_x.loc[(train_x['KMeans']==1),'tenure'].mean()
 test_y.loc[(test_y['KMeans']==2),'tenure']=train_x.loc[(train_x['KMeans']==2),'tenure'].mean()
 
+# make dataset fill with K means
 dataset_KMeans = pd.concat([test_y, train_x])
 
+print(" The result : ")
 print(dataset_KMeans)
 
 parallel_coordinates(dataset_KMeans,'KMeans',color=('r','g','b'),alpha=0.5)
 plt.show()
 
-print("# 3. fill missing values with regression")
+print("")
+print(" 4. fill missing values with regression")
 # test dataset 만들기
 test_x = dataset[dataset['tenure'].isna()]
 test_y = dataset[dataset['tenure'].isna()]
@@ -201,7 +282,10 @@ train_x = train_x.drop(columns='TotalCharges')
 tenure_reg = LinearRegression()
 tenure_reg.fit(train_x, train_y)
 predict_tenure = tenure_reg.predict(test_x)
+print("  4-1-1. predict tenure value")
 print(predict_tenure)
+print("")
+print("  4-1-2. regression score")
 print(tenure_reg.score(train_x, train_y))
 
 train_y = temp['TotalCharges']
@@ -209,8 +293,14 @@ train_y = temp['TotalCharges']
 charge_reg = LinearRegression()
 charge_reg.fit(train_x,train_y)
 predict_charge = charge_reg.predict(test_x)
+print("")
+print("  4-2-1. predict totalCharge value")
 print(predict_charge)
+print("")
+print("  4-2-2. regression score")
+print(charge_reg.score(train_x, train_y))
 
+# make dataset fill with regression
 test_x['tenure'] = predict_tenure
 test_x['TotalCharges']=predict_charge
 
@@ -218,9 +308,32 @@ train_x['TotalCharges'] = temp['TotalCharges']
 train_x['tenure'] = temp['tenure']
 
 dataset_linearRegression =  pd.concat([train_x, test_x])
-
+print("")
+print(" The result : ")
 print(dataset_linearRegression)
 
+def plot_tree_randomforest(columns, nf_estimators,
+                           estimated_tree, maximum_depth,
+                           criterion_type, model_performance=None):
+
+    # random forest classifier
+    rfc = RandomForestClassifier(n_estimators=nf_estimators,
+                                 max_depth=maximum_depth,
+                                 criterion=criterion_type,
+                                 )
+    rfc.fit(X_drop_train, Y_drop_train_encod)
+    estimated_tree = rfc.estimators_[estimated_tree]
+
+    print("cross validation score : ")
+    result = cross_val_score(rfc, X_drop_train, Y_drop_train_encod, cv=10)
+    print(np.mean(result) * 100, "%")
+
+    # model performance
+    if model_performance == True:
+        telecom_churn_prediction(rfc,
+                                 X_drop_train, X_drop_test,
+                                 Y_drop_train_encod,Y_drop_test_encod,
+                                 columns, "features", threshold_plot=True)
 
 def telecom_churn_prediction(algorithm, training_x, testing_x,
                              training_y, testing_y, cols, cf, threshold_plot):
@@ -299,7 +412,8 @@ def telecom_churn_prediction(algorithm, training_x, testing_x,
         visualizer.fit(training_x, training_y)
         visualizer.poof()
 
-print(" Predict dataset")
+print("")
+print(" # Predict dataset")
 # split dataset to train, test with drop
 Y_drop = dataset_drop['Churn']
 X_drop = dataset_drop.drop(columns='Churn')
@@ -318,8 +432,33 @@ X_regression = dataset_linearRegression.drop(columns='Churn')
 
 X_reg_train, X_reg_test, Y_reg_train, Y_reg_test = train_test_split(X_regression, Y_regression, test_size=0.1, shuffle=True, stratify=Y_regression, random_state=34)
 
+cols = [i for i in dataset.columns if i not in target_col]
+
 print(" 1. Random forest")
 # 소라가 코딩 - dataset_drop이랑 dataset_clustering 으로 두번 진행
+print(" 1-1. use dataset that missing value is dropped")
+lab_enc = LabelEncoder()
+Y_drop_train_encod = lab_enc.fit_transform(Y_drop_train)
+Y_drop_test_encod = lab_enc.fit_transform(Y_drop_test)
+
+plot_tree_randomforest(cols, 100, 10, 3, "entropy", True)
+
+print(" 1-2. use dataset that missing value is filled with k-means")
+
+lab_enc = LabelEncoder()
+Y_KMeans_train_encod = lab_enc.fit_transform(Y_KMeans_train)
+Y_KMeans_test_encod = lab_enc.fit_transform(Y_KMeans_test)
+
+plot_tree_randomforest(cols, 100, 10, 3, "entropy", True)
+
+print(" 1-3. use dataset that missing value is filled with regression")
+
+lab_enc = LabelEncoder()
+Y_reg_train_encod = lab_enc.fit_transform(Y_reg_train)
+Y_reg_test_encod = lab_enc.fit_transform(Y_reg_test)
+
+plot_tree_randomforest(cols, 100, 10, 3, "entropy", True)
+
 print(" 2. SVM - support vector machine")
 # 수경이가 코딩 - dataset_drop이랑 dataset_clustering, dataset_regression으로 3번 진행
 print(" 2-1. use dataset that missing value is dropped")
@@ -332,9 +471,14 @@ lab_enc = LabelEncoder()
 Y_drop_train_encod = lab_enc.fit_transform(Y_drop_train)
 Y_drop_test_encod = lab_enc.fit_transform(Y_drop_test)
 
-cols = [i for i in dataset.columns if i not in target_col]
+#do cross validation
+print("cross validation score : ")
+result = cross_val_score(svc_lin, X_drop_train, Y_drop_train_encod, cv=10)
+print(np.mean(result) * 100, "%")
+
 telecom_churn_prediction(svc_lin,X_drop_train,X_drop_test,Y_drop_train_encod,Y_drop_test_encod,
                          cols,"coefficients",threshold_plot = False)
+
 print(" 2-2. use dataset that missing value is filled with k-means")
 svc_lin  = SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
                decision_function_shape='ovr', degree=3, gamma=1.0, kernel='linear',
@@ -345,7 +489,11 @@ lab_enc = LabelEncoder()
 Y_KMeans_train_encod = lab_enc.fit_transform(Y_KMeans_train)
 Y_KMeans_test_encod = lab_enc.fit_transform(Y_KMeans_test)
 
-cols = [i for i in dataset.columns if i not in target_col]
+# do cross validation
+print("cross validation score : ")
+result = cross_val_score(svc_lin, X_KMeans_train, Y_KMeans_train_encod, cv=10)
+print(np.mean(result) * 100, "%")
+
 telecom_churn_prediction(svc_lin,X_KMeans_train,X_KMeans_test,Y_KMeans_train_encod,Y_KMeans_test_encod,
                          cols,"coefficients",threshold_plot = False)
 
@@ -359,6 +507,10 @@ lab_enc = LabelEncoder()
 Y_reg_train_encod = lab_enc.fit_transform(Y_reg_train)
 Y_reg_test_encod = lab_enc.fit_transform(Y_reg_test)
 
-cols = [i for i in dataset.columns if i not in target_col]
+#do cross validation
+print("cross validation score : ")
+result = cross_val_score(svc_lin, X_reg_train, Y_reg_train_encod, cv=10)
+print(np.mean(result) * 100, "%")
+
 telecom_churn_prediction(svc_lin,X_reg_train,X_reg_test,Y_reg_train_encod,Y_reg_test_encod,
                          cols,"coefficients",threshold_plot = False)
